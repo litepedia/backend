@@ -7,10 +7,11 @@ const cheerio = require("cheerio");
 
 export async function termWikiHandler(req: any, res: any) {
   await initCache();
-  let title = req.params[0];
+  // support express routing as well
+  let title = req.params[0] || req.params.term;
   try {
-    const minifiedContent = await fetchWikipediaContent(title);
-    let gptResponse = await callGpt(minifiedContent);
+    const wikiContent = await fetchWikipediaContent(title);
+    let gptResponse = await callGpt(wikiContent);
     const prettyTitle = capitalizeFirstLetter(title.replaceAll('_', ' '));
     gptResponse = capitalizeFirstLetter(gptResponse as string);
 
@@ -19,7 +20,6 @@ export async function termWikiHandler(req: any, res: any) {
       <!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Fish - Litepedia</title>

@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 
 
-app.get("/term/:title", termWikiHandler);
+app.get("/wiki/:term", termWikiHandler);
 
 app.listen(3000, async () => {
   await initCache();
