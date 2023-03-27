@@ -2,17 +2,27 @@
   "name": "elipedia",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "functions-framework --target=TypescriptFunction",
+    "prestart": "npm run build",
+    "gcp-build": "npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/functions-framework": "^3.1.3",
     "axios": "^1.3.4",
+    "bluebird": "^3.7.2",
     "cheerio": "^1.0.0-rc.12",
     "express": "^4.18.2",
-    "openai": "^3.2.1"
+    "openai": "^3.2.1",
+    "redis": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/redis": "^4.0.11",
+    "typescript": "^5.0.2"
   }
 }
