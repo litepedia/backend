@@ -1,9 +1,11 @@
 import axios from "axios";
 import {load} from "cheerio";
-import { getCachedContent } from "./cache";
+import { getCachedContent, setCachedContent } from "./cache";
 
 export async function fetchWikipediaContent(title: string): Promise<string> {
-    const cachedContent = await getCachedContent(title);
+    //@ts-ignore
+    title = title.replaceAll(' ', '_');
+    const cachedContent = await getCachedContent(`wiki:${title}`);
     if (cachedContent) {
         return cachedContent;
     }
@@ -19,6 +21,7 @@ export async function fetchWikipediaContent(title: string): Promise<string> {
       .map((paragraph: any) => $(paragraph).text().trim())
       .join(" ");
 
+    await setCachedContent(`wiki:${title}`, minifiedContent);
     return minifiedContent;
   } catch (error) {
     console.error(error);

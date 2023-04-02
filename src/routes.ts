@@ -2,16 +2,48 @@ import { callGpt } from "./api";
 import { initCache } from "./cache";
 import { capitalizeFirstLetter } from "./utils";
 import { fetchWikipediaContent } from "./wikiFetecher";
+import fs from "fs";
 const axios = require("axios");
 const cheerio = require("cheerio");
 
+
 export async function termWikiHandler(req: any, res: any) {
+  await initCache();
+  res.set('Access-Control-Allow-Origin', '*');
+  if (req.method === 'OPTIONS') {
+    // Send response to OPTIONS requests
+    res.set('Access-Control-Allow-Methods', 'GET');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    res.status(204).send('');
+    return;
+  }
+
+
+  let title = req.params[0] || req.params.term;
+  if (!title) {
+    res.send({});
+  }
+  
+  title = title.replaceAll(' ', '_').toLowerCase();
+  const wikiContent = await fetchWikipediaContent(title);
+  let gptResponse = await callGpt(title, wikiContent);
+  res.json({
+    title: capitalizeFirstLetter(title.replaceAll('_', ' ')),
+    content: capitalizeFirstLetter(gptResponse as string),
+  })
+}
+
+export async function termWikiHandlerHTML(req: any, res: any) {
   await initCache();
   // support express routing as well
   let title = req.params[0] || req.params.term;
+  if (!title) {
+    return res.send(homeRoute());
+  }
   try {
     const wikiContent = await fetchWikipediaContent(title);
-    let gptResponse = await callGpt(wikiContent);
+    let gptResponse = await callGpt(title, wikiContent);
     const prettyTitle = capitalizeFirstLetter(title.replaceAll('_', ' '));
     gptResponse = capitalizeFirstLetter(gptResponse as string);
 
@@ -85,4 +117,8 @@ export async function termWikiHandler(req: any, res: any) {
     console.error(error);
     res.status(500).send("<h1>An error occurred while scraping the content.</h1>");
   }
+}
+
+function homeRoute() {
+  return fs.readFileSync('./wiki-ac.html', 'utf8')
 }

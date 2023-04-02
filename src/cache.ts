@@ -13,15 +13,13 @@ export async function initCache() {
 }
 
 export async function getCachedContent(key: string): Promise<string> {
-    return new Promise(async (resolve: any) => {
-        let data = await redisClient.get(key);
-        if (data) {
-            console.log(`cache hit ${key}`);
-            resolve(data as string);
-        } else {
-            resolve('');
-        }
-    });
+    let data = await redisClient.get(key);
+    if (data) {
+        console.log(`cache hit ${key}`);
+        return data;
+    } else {
+        return '';
+    }
 }
 
 export async function setCachedContent(key: string, value: string) {

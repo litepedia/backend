@@ -5,8 +5,8 @@ const openai = new OpenAIApi(configuration);
 
 const BASE_QUESTION = process.env.GPT_QUESTION || 'explain to a first grader this paragraph in no longer than four sentences \n';
 
-export async function callGpt(text: string) {
-    const cachedResponse = await getCachedContent(text);
+export async function callGpt(key: string, text: string) {
+    const cachedResponse = await getCachedContent(key);
     if (cachedResponse) {
         return cachedResponse;
     }
@@ -21,7 +21,7 @@ export async function callGpt(text: string) {
     });
     const botMessage = response.data.choices[0].message;
     if (botMessage && botMessage.content) {
-        await setCachedContent(text, botMessage.content);
+        await setCachedContent(key, botMessage.content);
     }
     
     return botMessage?.content;
